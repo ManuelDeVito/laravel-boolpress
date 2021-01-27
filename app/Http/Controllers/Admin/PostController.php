@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Post;
+use App\Category;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -28,7 +30,10 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $data = [
+            'categories' => Category::all()
+        ];
+        return view('admin.posts.create', $data);
     }
 
     /**
@@ -39,7 +44,26 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $form_data = $request->all();
+        $new_post = new Post();
+        $new_post->fill($form_data);
+
+        $slug = Str::slug($new_post->title);
+        $slug_base = $slug;
+
+        $post_presente = Post::where('slug', $slug)->first();
+        $contatore = 1;
+
+        while($post_presente) {
+
+            $slug = $slug_base . '-' . $contatore;
+            $contatore++;
+            $post_presente = Post::where('slug', $slug)->first();
+        }
+
+        $new_post->slug = $slug;
+        $new_post->save();
+        return redirect()->route('admin.posts.index');
     }
 
     /**
@@ -48,9 +72,12 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        //
+        if(!$post) {
+            abort(404);
+        }
+        return view('admin.posts.show', ['post' => $post]);
     }
 
     /**
@@ -59,9 +86,18 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        if(!$post) {
+            abort(404);
+        }
+
+        $data = [
+            'post' => $post,
+            'categories' => Category::all()
+        ];
+
+        return view('admin.posts.edit', $data);
     }
 
     /**
@@ -71,9 +107,29 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        //
+        $form_data = $request->all();
+
+        if($form_data['title'] != $post->title) {
+
+            $slug = Str::slug($form_data['title']);
+            $slug_base = $slug;
+
+            $post_presente = Post::where('slug', $slug)->first();
+            $contatore = 1;
+
+            while($post_presente) {
+
+                $slug = $slug_base . '-' . $contatore;
+                $contatore++;
+                $post_presente = Post::where('slug', $slug)->first();
+            }
+
+            $form_data['slug'] = $slug;
+        }
+        $post->update($form_data);
+        return redirect()->route('admin.posts.index');
     }
 
     /**
@@ -82,8 +138,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index');
     }
 }

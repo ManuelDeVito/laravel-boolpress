@@ -4,14 +4,19 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-12">
-            <h1>Tutti i posts</h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1>Tutti i posts</h1>
+                <a href="{{ route('admin.posts.create') }}" class="btn btn-primary">
+                    Crea nuovo post
+                </a>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Titolo</th>
                         <th>Slug</th>
-                        <th>Azioni</th>
+                        <th class="text-center">Azioni</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -21,9 +26,19 @@
                             <td>{{ $post->title }}</td>
                             <td>{{ $post->slug }}</td>
                             <td>
-                                <a class="btn btn-info" href="#">
-                                    Visualizza
+                                <a class="btn btn-info btn-sm" href="{{ route('admin.posts.show', ['post' => $post->id ]) }}">
+                                    View
                                 </a>
+                                <a class="btn btn-warning btn-sm" href="{{ route('admin.posts.edit', ['post' => $post->id]) }}">
+                                    Edit
+                                </a>
+                                <form method="post" class="d-inline-block" action="{{ route('admin.posts.destroy', ['post' => $post->id]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        Delete
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @endforeach
