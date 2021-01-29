@@ -32,6 +32,17 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <p>Seleziona i tag:</p>
+                    @foreach ($tags as $tag)
+                        <div class="form-check">
+                            <input name="tags[]" class="form-check-input" type="checkbox" value="{{ $tag->id }}">
+                            <label class="form-check-label">
+                                {{ $tag->name }}
+                            </label>
+                        </div>
+                    @endforeach
+                </div>
+                <div class="form-group">
                     <button type="submit" class="btn btn-success">
                         Crea post
                     </button>

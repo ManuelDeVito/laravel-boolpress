@@ -17,10 +17,8 @@ class CategoriesTableSeeder extends Seeder
 
             $new_category = new Category();
             $new_category->name = $faker->words(3, true);
-
             $slug = Str::slug($new_category->name);
             $slug_base = $slug;
-
             $categoria_presente = Category::where('slug', $slug)->first();
             $contatore = 1;
 
@@ -30,7 +28,7 @@ class CategoriesTableSeeder extends Seeder
                 $contatore++;
                 $categoria_presente = Category::where('slug', $slug)->first();
             }
-            
+
             $new_category->slug = $slug;
             $new_category->save();
         }
